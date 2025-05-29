@@ -3,5 +3,5 @@ export type SettingsValue = {
 }
 
 export const settings = persistentMap<SettingsValue>('settings_', {
-  theme: 'dark'
+  theme: 'light'
 })

@@ -8,7 +8,18 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BsIcon: typeof import('./components/BsIcon.vue')['default']
+    CartDrawer: typeof import('./components/CartDrawer.vue')['default']
+    copy: typeof import('./components/ProductModal copy.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
+    MinimalShop: typeof import('./components/MinimalShop.vue')['default']
+    MinimalShop_old: typeof import('./components/MinimalShop_old.vue')['default']
+    ProductGrid: typeof import('./components/ProductGrid.vue')['default']
+    ProductGrid_old: typeof import('./components/ProductGrid_old.vue')['default']
+    ProductModal: typeof import('./components/ProductModal.vue')['default']
+    ProductModal_old: typeof import('./components/ProductModal_old.vue')['default']
+    Test: typeof import('./components/Test.vue')['default']
     ThemeSwitcher: typeof import('./components/ThemeSwitcher.vue')['default']
+    TopBar: typeof import('./components/TopBar.vue')['default']
+    TopBar_old: typeof import('./components/TopBar_old.vue')['default']
   }
 }
