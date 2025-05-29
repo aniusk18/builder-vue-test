@@ -113,8 +113,8 @@ const REGISTERED_COMPONENTS = [
 ];
 const content = ref<BuilderContent | null>(null);
 // // Add your Public API Key below
-const BUILDER_PUBLIC_API_KEY ='1efb6e7f6b4f4105b4c885b002ac6f7d';
-const apiKey ='1efb6e7f6b4f4105b4c885b002ac6f7d';
+const BUILDER_PUBLIC_API_KEY =import.meta.env.VITE_BUILDER_API_KEY;
+const apiKey =import.meta.env.VITE_BUILDER_API_KEY;
 const canShowContent = ref(false);
 const model = 'test-page';
 

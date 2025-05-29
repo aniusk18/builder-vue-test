@@ -37,7 +37,7 @@ export default {
   setup(props, { emit }) {
     track({
     type: 'productSelect',
-    apiKey: '1efb6e7f6b4f4105b4c885b002ac6f7d'
+    apiKey: import.meta.env.VITE_BUILDER_API_KEY
     });
     const handleProductClick = (product) => {
       emit('productSelect', product)
