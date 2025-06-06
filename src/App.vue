@@ -155,7 +155,7 @@ const REGISTERED_COMPONENTS = [
 const content = ref<BuilderContent | null>(null);
 const BUILDER_PUBLIC_API_KEY = import.meta.env.VITE_BUILDER_API_KEY;
 const canShowContent = ref(false);
-const model = 'test-page';
+const model = import.meta.env.VITE_BUILDER_PAGE;
 const preview = ref(false)
 
 onMounted(async () => {
