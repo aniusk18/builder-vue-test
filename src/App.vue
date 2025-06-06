@@ -9,7 +9,7 @@
     <LoginForm />
   </div>
   
-  <div v-else-if="user || preview"> 
+  <div v-else-if="user || preview">
     <div>
       <div v-if="preview">user preview</div>
       <div v-else>
@@ -55,6 +55,20 @@ import MinimalShop from './components/MinimalShop.vue';
 import TopBar from './components/TopBar.vue'
 import ProductGrid from './components/ProductGrid.vue'
 import ProductModal from './components/ProductModal.vue'
+
+// Define interfaces for TypeScript
+interface Product {
+  id: string | number;
+  name: string;
+  price: number;
+  image?: string;
+  description?: string;
+  category?: string;
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
 
 const { user, isLoading: isAuthLoading } = useAuth();
 
@@ -151,11 +165,11 @@ onMounted(async () => {
   await fetchContent();
 });
 
-// watch(user, async (newUser) => {
-//   if (newUser) {
-//     await fetchContent();
-//   }
-// });
+watch(user, async (newUser) => {
+  if (newUser) {
+    await fetchContent();
+  }
+});
 
 const fetchContent = async () => {
   content.value = await fetchOneEntry({
@@ -169,23 +183,23 @@ const fetchContent = async () => {
   canShowContent.value = content.value ? true : isPreviewing();
 };
 
-const products = ref([])
-// State
-const cart = ref([])
-const selectedProduct = ref(null)
+// State with proper typing
+const products = ref<Product[]>([])
+const cart = ref<CartItem[]>([])
+const selectedProduct = ref<Product | null>(null)
 const isCartOpen = ref(false)
 const searchQuery = ref("")
 
 // Computed
 const filteredProducts = computed(() => {
-  return products.value.filter(product => 
+  return products.value.filter((product: Product) => 
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-// Methods
-const addToCart = (product, quantity = 1) => {
-  const existingItem = cart.value.find(item => item.id === product.id)
+// Methods with proper typing
+const addToCart = (product: Product, quantity: number = 1) => {
+  const existingItem = cart.value.find((item: CartItem) => item.id === product.id)
   if (existingItem) {
     existingItem.quantity += quantity
   } else {
@@ -193,22 +207,22 @@ const addToCart = (product, quantity = 1) => {
   }
 }
 
-const removeFromCart = (productId) => {
-  const index = cart.value.findIndex(item => item.id === productId)
+const removeFromCart = (productId: string | number) => {
+  const index = cart.value.findIndex((item: CartItem) => item.id === productId)
   if (index > -1) {
     cart.value.splice(index, 1)
   }
 }
 
-const setSelectedProduct = (product) => {
+const setSelectedProduct = (product: Product) => {
   selectedProduct.value = product
 }
 
-const setSearchQuery = (query) => {
+const setSearchQuery = (query: string) => {
   searchQuery.value = query
 }
 
-const handleAddToCart = (product) => {
+const handleAddToCart = (product: Product) => {
   addToCart(product)
   selectedProduct.value = null
   isCartOpen.value = true
