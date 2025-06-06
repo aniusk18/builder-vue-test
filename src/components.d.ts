@@ -11,6 +11,7 @@ declare module 'vue' {
     CartDrawer: typeof import('./components/CartDrawer.vue')['default']
     copy: typeof import('./components/ProductModal copy.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
+    LoginForm: typeof import('./components/LoginForm.vue')['default']
     MinimalShop: typeof import('./components/MinimalShop.vue')['default']
     MinimalShop_old: typeof import('./components/MinimalShop_old.vue')['default']
     ProductGrid: typeof import('./components/ProductGrid.vue')['default']
@@ -21,5 +22,6 @@ declare module 'vue' {
     ThemeSwitcher: typeof import('./components/ThemeSwitcher.vue')['default']
     TopBar: typeof import('./components/TopBar.vue')['default']
     TopBar_old: typeof import('./components/TopBar_old.vue')['default']
+    UserProfile: typeof import('./components/UserProfile.vue')['default']
   }
 }

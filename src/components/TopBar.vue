@@ -1,5 +1,4 @@
 <template>
-  <p>topbar</p>
   <div class="sticky top-0 z-40 transition-all duration-200 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800"
        :class="{ 'shadow-sm': isScrolled }">
     <div class="flex items-center justify-between px-3 h-12">
@@ -95,6 +94,11 @@ export default {
       type: Array,
       default: ["All", "Lighting", "Kitchenware", "Home Decor", "Plants", "Office", "Textiles"]
     }
+  },
+  components: {
+    X,
+    Search,
+    ShoppingBag
   },
   emits: ['cartClick', 'search'],
   setup(props, { emit }) {

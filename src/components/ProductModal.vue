@@ -24,7 +24,6 @@
                 class="w-full h-[200px] md:h-full object-cover" 
               />
               <button
-                @click="$emit('close')"
                 class="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full"
               >
                 <X class="w-4 h-4" />
@@ -49,7 +48,6 @@
                 </div>
               </div>
               <button
-                @click="$emit('addToCart', product)"
                 class="w-full mt-3 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
               >
                 Add to Cart
@@ -78,7 +76,6 @@ export default {
   },
 
   setup(props, { emit }) {
-    console.log('paso')
   }
 }
 </script>

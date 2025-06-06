@@ -9,13 +9,12 @@
     <LoginForm />
   </div>
   
-  <div v-else-if="user || preview"> 
+  <div v-else-if="user || preview">
     <div>
       <div v-if="preview">user preview</div>
-      <div v-else>
+      <div v-else >
         NO PREVIEW
       </div>
-    </div>
     <div>Hello world from your Vue 3 project. Below is Builder Content--??:</div>
     <div v-if="canShowContent">
       <div>
@@ -32,6 +31,8 @@
     </div>
     <div v-else>Content not Found</div>
   </div>
+
+  </div>
   
   <div v-else class="loading">
     Loading...
@@ -46,7 +47,7 @@ import {
   type BuilderContent,
   getBuilderSearchParams,
 } from '@builder.io/sdk-vue';
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed} from 'vue';
 import { useAuth } from './composables/useAuth';
 import LoginForm from './components/LoginForm.vue';
 import UserProfile from './components/UserProfile.vue';
@@ -56,7 +57,24 @@ import TopBar from './components/TopBar.vue'
 import ProductGrid from './components/ProductGrid.vue'
 import ProductModal from './components/ProductModal.vue'
 
+// if (isPreviewing()) {
+//   const user = {
+//       uid: 'mockUID123',
+//       email: 'preview@builder.io',
+//       emailVerified: true,
+//       displayName: 'Preview User',
+//       photoURL: 'https://i.pravatar.cc/150?u=mockuser',
+//       phoneNumber: '+541112345678',
+//       providerId: 'firebase',
+//       metadata: {
+//         creationTime: 'Mon, 01 Jan 2024 00:00:00 GMT',
+//         lastSignInTime: 'Mon, 01 Jan 2024 00:00:00 GMT',
+//       },
+//     }
+//   const isLoadingfalse = false;
+// }else{
 const { user, isLoading: isAuthLoading } = useAuth();
+// }
 
 // Register your Builder components
 const REGISTERED_COMPONENTS = [
@@ -148,14 +166,18 @@ onMounted(async () => {
   if (isPreviewing()) {
     preview.value = true
   }
-  await fetchContent();
+  // Only fetch content if user is authenticated
+  //if (user.value) {
+    await fetchContent();
+  //}
 });
 
-// watch(user, async (newUser) => {
-//   if (newUser) {
-//     await fetchContent();
-//   }
-// });
+import { watch } from 'vue';
+watch(user, async (newUser) => {
+  if (newUser) {
+    await fetchContent();
+  }
+});
 
 const fetchContent = async () => {
   content.value = await fetchOneEntry({
@@ -167,7 +189,16 @@ const fetchContent = async () => {
     },
   });
   canShowContent.value = content.value ? true : isPreviewing();
+  
+  // window.addEventListener('productSelect', (e) => {
+  //   console.log('paso por select desde el codigo')
+  //   //setSelectedProduct(e.detail);
+  // });
+// onUnmounted(() => {
+//   window.removeEventListener('productSelect', setSelectedProduct);
+// });
 };
+
 
 const products = ref([])
 // State
@@ -178,7 +209,7 @@ const searchQuery = ref("")
 
 // Computed
 const filteredProducts = computed(() => {
-  return products.value.filter(product => 
+  return products.filter(product => 
     product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })

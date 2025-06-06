@@ -35,13 +35,13 @@ export default {
   },
   emits: ['productSelect'],
   setup(props, { emit }) {
-    track({
-    type: 'productSelect',
-    apiKey: import.meta.env.VITE_BUILDER_API_KEY
-    });
+    // track({
+    // type: 'selectedProduct',
+    // apiKey: import.meta.env.VITE_BUILDER_API_KEY
+    // });
     const handleProductClick = (product) => {
       emit('productSelect', product)
-      window.dispatchEvent(new CustomEvent('product-selected', { detail: product }))
+      window.dispatchEvent(new CustomEvent('productSelect', { detail: product }))
     }
 
     return {

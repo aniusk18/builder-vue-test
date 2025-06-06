@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@auth0/auth0-vue": "^2.4.0",
     "@builder.io/sdk-vue": "1.0.28",
     "@nanostores/persistent": "^0.10.1",
     "@nanostores/vue": "^0.11.0",
