@@ -1,0 +1,12 @@
+id,name,description,price,image,category
+p1,TEST - Minimal Desk Lamp,A sleek and modern desk lamp with adjustable brightness and color temperature.,89,https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Lighting
+p2,Ceramic Coffee Set,Handcrafted ceramic coffee set including 4 cups and a matching pour-over dripper.,65,https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Kitchenware
+p3,Linen Throw Pillow,Soft linen throw pillow with minimalist pattern design.,45,https://images.unsplash.com/photo-1579656381226-5fc0f0100c3b?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Home Decor
+p4,Wooden Wall Clock,Modern wooden wall clock with silent movement.,79,https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Home Decor
+p5,Concrete Planter,Minimalist concrete planter perfect for succulents.,34,https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Plants
+p6,Glass Vase Set,Set of 3 minimalist glass vases in varying sizes.,55,https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Home Decor
+p7,Bamboo Organizer,Desk organizer made from sustainable bamboo.,42,https://images.unsplash.com/photo-1591129841117-3adfd313e34f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Office
+p9,Marble Coasters,Set of 4 marble coasters with cork backing.,38,https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Kitchenware
+p10,Brass Bookends,"Modern geometric brass bookends, set of 2.",68,https://images.unsplash.com/photo-1544457070-4cd773b4d71e?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Office
+p11,Ceramic Plant Pot,Handmade ceramic plant pot with drainage hole.,48,https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Plants
+p12,Wall Mirror,Round wall mirror with minimal metal frame.,120,https://images.unsplash.com/photo-1618220179428-22790b461013?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3,Home Decor

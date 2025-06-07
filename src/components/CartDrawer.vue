@@ -66,22 +66,32 @@
   </Teleport>
 </template>
 
-<script setup>
+<script>
 import { computed } from 'vue'
 import { X } from 'lucide-vue-next'
 
-const props = defineProps({
-  cart: {
-    type: Array,
-    required: true
+export default {
+  name: 'CartDrawer',
+  components: {
+    X
+  },
+  props: {
+    cart: {
+      type: Array,
+      required: true
+    }
+  },
+  emits: ['close', 'removeFromCart'],
+  setup(props) {
+    const total = computed(() => {
+      return props.cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    })
+
+    return {
+      total
+    }
   }
-})
-
-defineEmits(['close', 'removeFromCart'])
-
-const total = computed(() => {
-  return props.cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-})
+}
 </script>
 
 <style scoped>

@@ -22,30 +22,74 @@
       </div>
     </div>
   </div>
+
+  <!-- Product Modal -->
+  <ProductModal 
+    v-if="selectedProduct"
+    :product="selectedProduct"
+    @close="closeModal"
+    @add-to-cart="handleAddToCartGrid"
+  />
 </template>
 
 <script>
-import { track } from '@builder.io/sdk-vue'
+import { ref, inject } from 'vue'
+import ProductModal from './ProductModal.vue'
+
 export default {
+  name: 'ProductGrid',
+  components: {
+    ProductModal
+  },
   props: {
     products: {
       type: Array,
       default: () => []
+    },
+    // Recibir las funciones como props desde Builder
+    addToCart: {
+      type: Function,
+      default: () => {}
+    },
+    onProductSelect: {
+      type: Function,
+      default: () => {}
     }
   },
-  emits: ['productSelect'],
-  setup(props, { emit }) {
-    // track({
-    // type: 'selectedProduct',
-    // apiKey: import.meta.env.VITE_BUILDER_API_KEY
-    // });
+  setup(props) {
+    const selectedProduct = ref(null)
+
     const handleProductClick = (product) => {
-      emit('productSelect', product)
+      selectedProduct.value = product
+      // Usar la función pasada desde App.vue
+      if (props.onProductSelect) {
+        props.onProductSelect(product)
+      }
       window.dispatchEvent(new CustomEvent('productSelect', { detail: product }))
     }
 
+    const closeModal = () => {
+      selectedProduct.value = null
+    }
+
+    const handleAddToCartGrid = (product, quantity) => {
+      console.log('ProductGrid: Received add-to-cart event', product, quantity)
+      
+      // Usar la función pasada desde App.vue
+      if (props.addToCart) {
+        console.log('ProductGrid: Calling addToCart function from props')
+        props.addToCart(product, quantity)
+      } else {
+        console.log('ProductGrid: addToCart function not available in props')
+      }
+      closeModal()
+    }
+
     return {
-      handleProductClick
+      selectedProduct,
+      handleProductClick,
+      closeModal,
+      handleAddToCartGrid
     }
   }
 }

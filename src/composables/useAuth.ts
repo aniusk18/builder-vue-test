@@ -1,5 +1,6 @@
 import { useAuth0 } from '@auth0/auth0-vue'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
+import { useSupabase } from './useSupabase'
 
 export function useAuth() {
   const {
@@ -9,6 +10,8 @@ export function useAuth() {
     loginWithRedirect,
     logout: auth0Logout
   } = useAuth0()
+
+  const { createOrUpdateUser } = useSupabase()
 
   // Transform Auth0 user to match your existing user structure
   const user = computed(() => {
@@ -28,6 +31,13 @@ export function useAuth() {
       },
     }
   })
+
+  // Watch for user changes and sync with Supabase
+  watch(auth0User, async (newUser) => {
+    if (newUser && isAuthenticated.value) {
+      await createOrUpdateUser(newUser)
+    }
+  }, { immediate: true })
 
   const login = () => {
     loginWithRedirect()

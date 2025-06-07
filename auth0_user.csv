@@ -1,0 +1,2 @@
+id,name,email,created_at,role,status
+auth0|60f7f2d6e1234567890abcdef,Jane Doe,jane.doe@example.com,2025-06-06T10:15:00Z,user,active

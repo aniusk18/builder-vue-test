@@ -27,7 +27,14 @@
         :content="content"
         :api-key="BUILDER_PUBLIC_API_KEY"
         :customComponents="REGISTERED_COMPONENTS"
-        :data="products"
+        :data="{ 
+          products: products,
+          cart: cart,
+          cartItemCount: cartItemCount,
+          addToCart: handleAddToCart,
+          removeFromCart: handleRemoveFromCart,
+          toggleCart: toggleCart
+        }"
       />
     </div>
     <div v-else>Content not Found</div>
@@ -36,6 +43,14 @@
   <div v-else class="loading">
     Loading...
   </div>
+
+  <!-- Cart Drawer -->
+  <CartDrawer 
+    v-if="isCartOpen"
+    :cart="cart"
+    @close="toggleCart"
+    @remove-from-cart="handleRemoveFromCart"
+  />
 </template>
 
 <script setup lang="ts">
@@ -54,7 +69,7 @@ import Test from './components/Test.vue';
 import MinimalShop from './components/MinimalShop.vue';
 import TopBar from './components/TopBar.vue'
 import ProductGrid from './components/ProductGrid.vue'
-import ProductModal from './components/ProductModal.vue'
+import CartDrawer from './components/CartDrawer.vue'
 
 // Define interfaces for TypeScript
 interface Product {
@@ -129,6 +144,11 @@ const REGISTERED_COMPONENTS = [
         name: 'productSelect',
         type: 'event',
       },
+      {
+        name: 'addToCart',
+        type: 'function',
+        defaultValue: null
+      },
     ],
     outputs: [
       {
@@ -138,18 +158,18 @@ const REGISTERED_COMPONENTS = [
       },
     ],
   },
-  {
-    component: ProductModal,
-    name: 'ProductModal',
-    canHaveChildren: true,
-    inputs: [
-      {
-        name: 'product',
-        type: 'Object',
-        defaultValue: null
-      },
-    ],
-  },
+  // {
+  //   component: ProductModal,
+  //   name: 'ProductModal',
+  //   canHaveChildren: true,
+  //   inputs: [
+  //     {
+  //       name: 'product',
+  //       type: 'Object',
+  //       defaultValue: null
+  //     },
+  //   ],
+  // },
 ];
 
 const content = ref<BuilderContent | null>(null);
@@ -197,9 +217,18 @@ const filteredProducts = computed(() => {
   )
 })
 
+const cartItemCount = computed(() => {
+  return cart.value.reduce((total, item) => total + item.quantity, 0)
+})
+
+const cartTotal = computed(() => {
+  return cart.value.reduce((total, item) => total + (item.price * item.quantity), 0)
+})
+
 // Methods with proper typing
-const addToCart = (product: Product, quantity: number = 1) => {
-  const existingItem = cart.value.find((item: CartItem) => item.id === product.id)
+const addToCartMain = (product: Product, quantity: number = 1) => {
+  console.log('App.vue: addToCart function called')
+  const existingItem = cart.value.find(item => item.id === product.id)
   if (existingItem) {
     existingItem.quantity += quantity
   } else {
@@ -214,6 +243,10 @@ const removeFromCart = (productId: string | number) => {
   }
 }
 
+const handleRemoveFromCart = (productId: string | number) => {
+  removeFromCart(productId)
+}
+
 const setSelectedProduct = (product: Product) => {
   selectedProduct.value = product
 }
@@ -222,9 +255,16 @@ const setSearchQuery = (query: string) => {
   searchQuery.value = query
 }
 
-const handleAddToCart = (product: Product) => {
-  addToCart(product)
-  selectedProduct.value = null
-  isCartOpen.value = true
+// Funciones que serán accesibles desde Builder
+  // Funciones que serán accesibles desde Builder
+    const handleAddToCart = (product: Product, quantity = 1) => {
+      console.log("App.vue: handleAddToCart called", product, "quantity:", quantity)
+      addToCartMain(product, quantity)
+      selectedProduct.value = null
+      isCartOpen.value = true
+    }
+
+const toggleCart = () => {
+  isCartOpen.value = !isCartOpen.value
 }
 </script>

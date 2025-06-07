@@ -13,6 +13,7 @@
     "@builder.io/sdk-vue": "1.0.28",
     "@nanostores/persistent": "^0.10.1",
     "@nanostores/vue": "^0.11.0",
+    "@supabase/supabase-js": "^2.50.0",
     "@tailwindcss/vite": "^4.0.0",
     "@vueuse/head": "^2.0.0",
     "lucide-vue-next": "^0.511.0",
