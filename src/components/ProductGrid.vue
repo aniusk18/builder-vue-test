@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { ref, inject } from 'vue'
+import { ref } from 'vue'
 import ProductModal from './ProductModal.vue'
 
 export default {
@@ -45,15 +45,6 @@ export default {
     products: {
       type: Array,
       default: () => []
-    },
-    // Recibir las funciones como props desde Builder
-    addToCart: {
-      type: Function,
-      default: () => {}
-    },
-    onProductSelect: {
-      type: Function,
-      default: () => {}
     }
   },
   setup(props) {
@@ -61,11 +52,7 @@ export default {
 
     const handleProductClick = (product) => {
       selectedProduct.value = product
-      // Usar la función pasada desde App.vue
-      if (props.onProductSelect) {
-        props.onProductSelect(product)
-      }
-      window.dispatchEvent(new CustomEvent('productSelect', { detail: product }))
+      console.log('Product clicked:', product)
     }
 
     const closeModal = () => {
@@ -73,15 +60,14 @@ export default {
     }
 
     const handleAddToCartGrid = (product, quantity) => {
-      console.log('ProductGrid: Received add-to-cart event', product, quantity)
+      console.log('🔥 ProductGrid: handleAddToCartGrid called', product, quantity)
       
-      // Usar la función pasada desde App.vue
-      if (props.addToCart) {
-        console.log('ProductGrid: Calling addToCart function from props')
-        props.addToCart(product, quantity)
-      } else {
-        console.log('ProductGrid: addToCart function not available in props')
-      }
+      // Usar evento global directamente
+      console.log('📡 Dispatching global event: builderAddToCart')
+      window.dispatchEvent(new CustomEvent('builderAddToCart', { 
+        detail: { product, quantity } 
+      }))
+      
       closeModal()
     }
 
