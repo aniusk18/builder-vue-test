@@ -86,19 +86,51 @@ export function useSupabase() {
     error.value = null
     
     try {
-      const { data, error: supabaseError } = await supabase
+      // Primero obtener los items del carrito
+      const { data: cartData, error: cartError } = await supabase
         .from('shopping_cart')
-        .select(`
-          *,
-          productos (*)
-        `)  // Join con tabla 'productos'
+        .select('*')
         .eq('user_id', userId)
         .order('added_at', { ascending: false })
-      
-      if (supabaseError) throw supabaseError
-      return data || []
+    
+      if (cartError) {
+        console.error('Error getting cart items:', cartError)
+        throw cartError
+      }
+
+      if (!cartData || cartData.length === 0) {
+        return []
+      }
+
+      // Obtener los IDs de productos únicos
+      const productIds = [...new Set(cartData.map(item => item.product_id))]
+    
+      // Obtener los productos
+      const { data: productsData, error: productsError } = await supabase
+        .from('productos')
+        .select('*')
+        .in('id', productIds)
+    
+      if (productsError) {
+        console.error('Error getting products:', productsError)
+        throw productsError
+      }
+
+      // Combinar los datos
+      const cartItemsWithProducts = cartData.map(cartItem => {
+        const product = productsData.find(p => p.id === cartItem.product_id)
+        return {
+          ...cartItem,
+          productos: product || null
+        }
+      })
+
+      console.log('Cart items with products:', cartItemsWithProducts)
+      return cartItemsWithProducts
+    
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error fetching cart items'
+      console.error('Error in getCartItems:', err)
       return []
     } finally {
       loading.value = false
@@ -106,11 +138,13 @@ export function useSupabase() {
   }
 
   const addToCart = async (userId: string, productId: string, quantity: number = 1): Promise<boolean> => {
+    console.log('🔧 useSupabase: addToCart called with:', { userId, productId, quantity })
     loading.value = true
     error.value = null
     
     try {
       // Check if item already exists in cart
+      console.log('🔍 Checking if item exists in cart...')
       const { data: existingItem } = await supabase
         .from('shopping_cart')
         .select('*')
@@ -118,31 +152,47 @@ export function useSupabase() {
         .eq('product_id', productId)
         .single()
 
+      console.log('🔍 Existing item:', existingItem)
+
       if (existingItem) {
         // Update quantity
+        console.log('📝 Updating existing item quantity...')
         const { error: updateError } = await supabase
           .from('shopping_cart')
           .update({ quantity: existingItem.quantity + quantity })
           .eq('id', existingItem.id)
         
-        if (updateError) throw updateError
+        if (updateError) {
+          console.error('❌ Update error:', updateError)
+          throw updateError
+        }
+        console.log('✅ Item quantity updated successfully')
       } else {
-        // Insert new item - generar ID único
+        // Insert new item
+        console.log('➕ Inserting new item...')
+        const newItem = {
+          id: `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          user_id: userId,
+          product_id: productId,
+          quantity,
+          added_at: new Date().toISOString()
+        }
+        console.log('➕ New item data:', newItem)
+        
         const { error: insertError } = await supabase
           .from('shopping_cart')
-          .insert({
-            id: `cart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // ID único
-            user_id: userId,
-            product_id: productId,
-            quantity,
-            added_at: new Date().toISOString()
-          })
+          .insert(newItem)
         
-        if (insertError) throw insertError
+        if (insertError) {
+          console.error('❌ Insert error:', insertError)
+          throw insertError
+        }
+        console.log('✅ New item inserted successfully')
       }
       
       return true
     } catch (err) {
+      console.error('💥 Error in addToCart:', err)
       error.value = err instanceof Error ? err.message : 'Error adding to cart'
       return false
     } finally {

@@ -12,11 +12,10 @@
   <div v-else-if="user || preview">
     <div>
       <div v-if="preview">user preview</div>
-      <div v-else>
-        NO PREVIEW
+        <div v-else>
+          NO PREVIEW
+        </div>
       </div>
-    </div>
-    <div>Hello world from your Vue 3 project. Below is Builder Content--??:</div>
     <div v-if="canShowContent">
       <div>
         page title:
@@ -29,7 +28,7 @@
         :customComponents="REGISTERED_COMPONENTS"
         :data="{ 
           products: products,
-          cart: cart,
+          cart: cartItems, // Usar cartItems desde useCart
           cartItemCount: cartItemCount
         }"
       />
@@ -44,7 +43,7 @@
   <!-- Cart Drawer -->
   <CartDrawer 
     v-if="isCartOpen"
-    :cart="cart"
+    :cart="cartItems"
     @close="toggleCart"
     @remove-from-cart="handleRemoveFromCart"
   />
@@ -59,6 +58,8 @@ import {
 } from '@builder.io/sdk-vue';
 import { onMounted, ref, computed, watch, onUnmounted } from 'vue';
 import { useAuth } from './composables/useAuth';
+import { useCart } from './composables/useCart'; // Solo usar useCart
+import { useSupabase } from './composables/useSupabase'; // Solo para productos
 import LoginForm from './components/LoginForm.vue';
 import UserProfile from './components/UserProfile.vue';
 import Test from './components/Test.vue';
@@ -83,6 +84,27 @@ export default {
   },
   setup() {
     const { user, isLoading: isAuthLoading } = useAuth();
+    
+    // Usar useCart para todo lo relacionado con el carrito
+    const { 
+      cartItems,
+      cartItemCount,
+      cartTotal,
+      isCartOpen,
+      loading: cartLoading,
+      addToCart,
+      updateQuantity,
+      removeFromCart,
+      clearCart,
+      toggleCart
+    } = useCart();
+
+    // Usar useSupabase solo para productos
+    const { 
+      loading: productsLoading, 
+      error: productsError,
+      getProducts
+    } = useSupabase();
 
     // Register your Builder components
     const REGISTERED_COMPONENTS = [
@@ -159,11 +181,9 @@ export default {
     const model = 'test-page';
     const preview = ref(false)
 
-    // State
+    // State simplificado
     const products = ref([])
-    const cart = ref([])
     const selectedProduct = ref(null)
-    const isCartOpen = ref(false)
     const searchQuery = ref("")
 
     // Computed
@@ -173,53 +193,55 @@ export default {
       )
     })
 
-    const cartItemCount = computed(() => {
-      return cart.value.reduce((total, item) => total + item.quantity, 0)
-    })
+    // Cargar productos desde Supabase
+    const loadProducts = async () => {
+      console.log('📦 Loading products from Supabase...')
+      const supabaseProducts = await getProducts()
+      products.value = supabaseProducts
+      console.log('📦 Products loaded:', supabaseProducts.length, 'products')
+    }
 
-    const cartTotal = computed(() => {
-      return cart.value.reduce((total, item) => total + (item.price * item.quantity), 0)
-    })
-
-    // Methods
-    const addToCart = (product, quantity = 1) => {
-      console.log('📦 App.vue: addToCart function executed', product, quantity)
-      const existingItem = cart.value.find(item => item.id === product.id)
-      if (existingItem) {
-        existingItem.quantity += quantity
+    // Función simplificada que usa useCart
+    const handleAddToCart = async (product, quantity = 1) => {
+      console.log('🌍 App.vue: handleAddToCart called', product.name, 'quantity:', quantity)
+      
+      const success = await addToCart(product.id, quantity)
+      
+      if (success) {
+        console.log('✅ Product added to cart successfully')
+        isCartOpen.value = true // Abrir carrito
       } else {
-        cart.value.push({ ...product, quantity })
-      }
-      console.log('📦 Cart updated:', cart.value)
-    }
-
-    const removeFromCart = (productId) => {
-      const index = cart.value.findIndex(item => item.id === productId)
-      if (index > -1) {
-        cart.value.splice(index, 1)
+        console.error('❌ Failed to add product to cart')
       }
     }
 
-    const handleRemoveFromCart = (productId) => {
-      removeFromCart(productId)
-    }
-
-    const toggleCart = () => {
-      isCartOpen.value = !isCartOpen.value
+    // Función para remover del carrito
+    const handleRemoveFromCart = async (cartItemId) => {
+      console.log('🗑️ App.vue: handleRemoveFromCart called', cartItemId)
+      const success = await removeFromCart(cartItemId)
+      
+      if (success) {
+        console.log('✅ Product removed from cart successfully')
+      } else {
+        console.error('❌ Failed to remove product from cart')
+      }
     }
 
     // Escuchar eventos globales
     const handleGlobalAddToCart = (event) => {
       console.log('🌍 App.vue: Global event received:', event.detail)
       const { product, quantity } = event.detail
-      addToCart(product, quantity)
-      isCartOpen.value = true // Abrir carrito automáticamente
+      handleAddToCart(product, quantity)
     }
 
     onMounted(async () => {
       if (isPreviewing()) {
         preview.value = true
       }
+      isCartOpen.value = true
+      // Cargar productos
+      await loadProducts()
+      
       await fetchContent();
       
       // Agregar listener para eventos globales
@@ -231,9 +253,14 @@ export default {
       window.removeEventListener('builderAddToCart', handleGlobalAddToCart)
     })
 
-    watch(user, async (newUser) => {
-      if (newUser) {
+    watch(user, async (newUser, oldUser) => {
+      if (newUser && !oldUser) {
+        // Usuario se autenticó
+        console.log('👤 User authenticated:', newUser.sub)
         await fetchContent();
+      } else if (!newUser && oldUser) {
+        // Usuario se desautenticó - useCart maneja esto automáticamente
+        console.log('👤 User logged out')
       }
     });
 
@@ -254,6 +281,11 @@ export default {
       user,
       isAuthLoading,
       
+      // Loading states
+      cartLoading,
+      productsLoading,
+      productsError,
+      
       // Builder
       content,
       BUILDER_PUBLIC_API_KEY,
@@ -264,19 +296,20 @@ export default {
       
       // State
       products,
-      cart,
       selectedProduct,
-      isCartOpen,
       searchQuery,
+      
+      // Cart state (desde useCart)
+      cartItems,
+      cartItemCount,
+      cartTotal,
+      isCartOpen,
       
       // Computed
       filteredProducts,
-      cartItemCount,
-      cartTotal,
       
       // Methods
-      addToCart,
-      removeFromCart,
+      handleAddToCart,
       handleRemoveFromCart,
       toggleCart
     }
