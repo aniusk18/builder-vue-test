@@ -9,18 +9,12 @@
     <LoginForm />
   </div>
   
-  <div v-else-if="user || preview">
-    <div>
-      <div v-if="preview">user preview</div>
-        <div v-else>
-          NO PREVIEW
-        </div>
-      </div>
+  <!-- <div v-else-if="user || preview"> -->
     <div v-if="canShowContent">
-      <div>
+      <!-- <div>
         page title:
         {{ (content && content.data && content.data.title) || 'Unpublished' }}
-      </div>
+      </div> -->
       <Content
         :model="model"
         :content="content"
@@ -28,17 +22,20 @@
         :customComponents="REGISTERED_COMPONENTS"
         :data="{ 
           products: products,
+          user: user,
+          preview: preview,
           cart: cartItems, // Usar cartItems desde useCart
-          cartItemCount: cartItemCount
+          cartItemCount: cartItemCount,
+          toggleCart: toggleCart, 
         }"
       />
     </div>
     <div v-else>Content not Found</div>
-  </div>
+  <!-- </div> -->
   
-  <div v-else class="loading">
+  <!-- <div v-else class="loading">
     Loading...
-  </div>
+  </div> -->
 
   <!-- Cart Drawer -->
   <CartDrawer 
@@ -68,6 +65,7 @@ import TopBar from './components/TopBar.vue'
 import ProductGrid from './components/ProductGrid.vue'
 import ProductModal from './components/ProductModal.vue'
 import CartDrawer from './components/CartDrawer.vue'
+import BoxUserView from './components/BoxUserView.vue'
 
 export default {
   name: 'App',
@@ -84,7 +82,8 @@ export default {
   },
   setup() {
     const { user, isLoading: isAuthLoading } = useAuth();
-    
+    console.log('user desde app')
+    console.log(user)
     // Usar useCart para todo lo relacionado con el carrito
     const { 
       cartItems,
@@ -121,6 +120,34 @@ export default {
         ],
       },
       {
+        component: BoxUserView,
+        name: 'BoxUserView',
+        canHaveChildren: true,
+        defaultChildren: [
+          {
+            '@type': '@builder.io/sdk:Element',
+            component: {
+              name: 'Text',
+              options: {
+                text: 'This is Builder text',
+              },
+            },
+          },
+        ],
+        inputs: [
+          {
+            name: 'user',
+            type: 'Object',
+            defaultValue: null,
+            helperText: 'User object from the data context'
+          },
+          {
+            name: 'preview',
+            type: 'Boolean'
+          }
+        ],
+      },
+      {
         component: MinimalShop,
         name: 'MinimalShop',
         canHaveChildren: true,
@@ -147,6 +174,11 @@ export default {
             type: 'Array',
             defaultValue: ["All", "Lighting", "Kitchenware", "Home Decor", "Plants", "Office", "Textiles"]
           },
+          {
+            name: 'toggleCart',
+            type: 'function',
+            defaultValue: null
+          }
         ],
       },
       {
@@ -238,7 +270,7 @@ export default {
       if (isPreviewing()) {
         preview.value = true
       }
-      isCartOpen.value = true
+      // isCartOpen.value = true
       // Cargar productos
       await loadProducts()
       
@@ -247,6 +279,11 @@ export default {
       // Agregar listener para eventos globales
       console.log('🎧 App.vue: Adding global event listener')
       window.addEventListener('builderAddToCart', handleGlobalAddToCart)
+      // Escuchar evento de toggle cart
+      window.addEventListener('toggleCart', () => {
+        console.log('🛒 Received toggleCart event')
+        toggleCart()
+      })
     });
 
     onUnmounted(() => {

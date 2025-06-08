@@ -1,48 +1,64 @@
 <template>
-  <div 
-    v-if="product" 
-    class="modal-overlay"
-    @click="handleOverlayClick"
-  >
-    <div class="modal-content" @click.stop>
-      <!-- Close Button -->
-      <button 
-        @click="$emit('close')"
-        class="close-button"
-        aria-label="Close modal"
-      >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-
-      <div class="modal-body">
-        <!-- Product Image -->
-        <div class="image-container">
-          <img 
-            :src="product.image" 
-            :alt="product.name"
-            class="product-image"
-          />
-        </div>
-
-        <!-- Product Details -->
-        <div class="product-details">
-          <div class="product-header">
-            <h2 class="product-title">{{ product.name }}</h2>
-            <p class="product-category">{{ product.category }}</p>
-          </div>
-
-          <p class="product-description">
-            {{ product.description || 'No description available.' }}
-          </p>
-
-          <div class="product-footer">
-            <div class="price-section">
-              <span class="price">${{ product.price }}</span>
+  <Teleport to="body">
+    <div class="fixed inset-0 z-50">
+      <!-- Backdrop -->
+      <Transition name="backdrop">
+        <div 
+          v-if="product"
+          class="fixed inset-0 bg-black/50"
+          @click="$emit('close')"
+          aria-label="Close modal"
+        />
+      </Transition>
+      
+      <!-- Modal -->
+      <Transition name="modal">
+        <div 
+          v-if="product"
+          class="fixed inset-x-4 bottom-0 md:inset-[25%] z-50 bg-white dark:bg-zinc-900 rounded-t-xl md:rounded-xl overflow-hidden max-h-[80vh] md:max-h-[500px]"
+        >
+          <div class="h-full md:flex">
+            <div class="relative md:w-2/5">
+              <img 
+                :src="product.image" 
+                :alt="product.name" 
+                class="w-full h-[200px] md:h-full object-cover" 
+              />
+              <button
+                @click="$emit('close')"
+                class="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full"
+              >
+                <X class="w-4 h-4" />
+              </button>
             </div>
 
-            <div class="quantity-section">
+            <div class="p-3 md:w-3/5 flex flex-col">
+              <div class="flex-1">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <h2 class="text-sm font-medium">{{ product.name }}</h2>
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ product.category }}</p>
+                  </div>
+                  <p class="text-sm font-medium">${{ product.price }}</p>
+                  <!-- Close Button -->
+                  <button 
+                    @click="$emit('close')"
+                    class="close-button"
+                    aria-label="Close modal"
+                  >
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="space-y-2">
+                  <p class="text-xs text-zinc-600 dark:text-zinc-300">{{ product.description }}</p>
+                  <div class="text-xs space-y-1">
+                    <p class="text-zinc-500">SKU: {{ product.id }}</p>
+                    <p class="text-zinc-500">Stock: Available</p>
+                  </div>
+                </div>
+                <div class="quantity-section">
               <label for="quantity" class="quantity-label">Quantity:</label>
               <div class="quantity-controls">
                 <button 
@@ -58,7 +74,7 @@
                   type="number"
                   min="1"
                   max="99"
-                  class="quantity-input"
+                  class="quantity-input "
                 />
                 <button 
                   @click="increaseQuantity"
@@ -69,25 +85,25 @@
                 </button>
               </div>
             </div>
-
-            <button 
-              @click="handleAddToCartModal"
-              class="add-to-cart-btn"
-              :disabled="isLoading"
-            >
-              <span v-if="isLoading" class="loading-spinner"></span>
-              {{ isLoading ? 'Adding...' : 'Add to Cart' }}
-            </button>
+              </div>
+              <button
+                @click="handleAddToCartModal"
+                class="w-full mt-3 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </Transition>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+import { X } from 'lucide-vue-next'
 export default {
   name: 'ProductModal',
   props: {
@@ -163,134 +179,29 @@ export default {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
+.backdrop-enter-active, .backdrop-leave-active {
+  transition: opacity 0.2s ease;
+}
+.backdrop-enter-from, .backdrop-leave-to {
+  opacity: 0;
 }
 
-.modal-content {
-  background: white;
-  border-radius: 1rem;
-  max-width: 4xl;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+.modal-enter-active, .modal-leave-active {
+  transition: all 0.3s ease;
 }
-
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 50%;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  color: #374151;
-}
-
-.close-button:hover {
-  background: white;
-  transform: scale(1.1);
-}
-
-.modal-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  padding: 2rem;
-}
-
-.image-container {
-  aspect-ratio: 1;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background: #f9fafb;
-}
-
-.product-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.product-details {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.product-header {
-  border-bottom: 1px solid #e5e7eb;
-  padding-bottom: 1rem;
-}
-
-.product-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.5rem;
-}
-
-.product-category {
-  color: #6b7280;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.product-description {
-  color: #374151;
-  line-height: 1.6;
-  font-size: 1rem;
-}
-
-.product-footer {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.price-section {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1rem;
-}
-
-.price {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
 }
 
 .quantity-section {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 1rem 0rem;
 }
 
-.quantity-label {
-  font-weight: 500;
-  color: #374151;
-}
+
 
 .quantity-controls {
   display: flex;
@@ -303,8 +214,8 @@ export default {
 .quantity-btn {
   background: #f9fafb;
   border: none;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -326,73 +237,10 @@ export default {
 .quantity-input {
   border: none;
   width: 3rem;
-  height: 2.5rem;
+  height: 1.5rem;
   text-align: center;
   font-weight: 500;
   outline: none;
-}
-
-.add-to-cart-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 0.75rem;
-  padding: 1rem 2rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 3.5rem;
-}
-
-.add-to-cart-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.add-to-cart-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.loading-spinner {
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .modal-body {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 1.5rem;
-  }
-  
-  .product-title {
-    font-size: 1.5rem;
-  }
-  
-  .price {
-    font-size: 1.5rem;
-  }
-  
-  .quantity-section {
-    justify-content: space-between;
-  }
+  color: #111827;
 }
 </style>

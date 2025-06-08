@@ -60,8 +60,8 @@
         
         <button
           type="button"
-          @click="$emit('cartClick')"
-          class="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md relative text-zinc-700 dark:text-zinc-300"
+          @click="handleCartClick"
+          class="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md relative text-zinc-700 dark:text-zinc-300 cursor-pointer"
         >
           <ShoppingBag class="w-4 h-4" />
           <Transition name="badge">
@@ -93,6 +93,10 @@ export default {
     categories: {
       type: Array,
       default: ["All", "Lighting", "Kitchenware", "Home Decor", "Plants", "Office", "Textiles"]
+    },
+    toggleCart: {
+      type: Function,
+      default: () => {}
     }
   },
   components: {
@@ -143,6 +147,13 @@ export default {
       window.removeEventListener('scroll', handleScroll)
     })
 
+    const handleCartClick = () => {
+      console.log('🛒 Cart button clicked - dispatching window event')
+      
+      // Disparar evento global
+      window.dispatchEvent(new CustomEvent('toggleCart'))
+    }
+
     return {
       categories,
       isSearchOpen,
@@ -152,7 +163,8 @@ export default {
       toggleSearch,
       closeSearch,
       handleSearch,
-      handleKeyPress
+      handleKeyPress,
+      handleCartClick
     }
   }
 }

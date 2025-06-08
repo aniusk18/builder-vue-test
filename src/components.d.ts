@@ -7,9 +7,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BoxUserView: typeof import('./components/BoxUserView.vue')['default']
     BsIcon: typeof import('./components/BsIcon.vue')['default']
     CartDrawer: typeof import('./components/CartDrawer.vue')['default']
-    copy: typeof import('./components/ProductModal copy.vue')['default']
+    copy: typeof import('./components/Test copy.vue')['default']
     Header: typeof import('./components/Header.vue')['default']
     LoginForm: typeof import('./components/LoginForm.vue')['default']
     MinimalShop: typeof import('./components/MinimalShop.vue')['default']
@@ -17,6 +18,8 @@ declare module 'vue' {
     ProductGrid: typeof import('./components/ProductGrid.vue')['default']
     ProductGrid_old: typeof import('./components/ProductGrid_old.vue')['default']
     ProductModal: typeof import('./components/ProductModal.vue')['default']
+    ProductModal_copy: typeof import('./components/ProductModal_new.vue')['default']
+    ProductModal_new: typeof import('./components/ProductModal_new.vue')['default']
     ProductModal_old: typeof import('./components/ProductModal_old.vue')['default']
     Test: typeof import('./components/Test.vue')['default']
     ThemeSwitcher: typeof import('./components/ThemeSwitcher.vue')['default']

@@ -7,6 +7,7 @@
           v-if="product"
           class="fixed inset-0 bg-black/50"
           @click="$emit('close')"
+          aria-label="Close modal"
         />
       </Transition>
       
@@ -49,7 +50,7 @@
                 </div>
               </div>
               <button
-                @click="$emit('addToCart', product)"
+                @click="handleAddToCartModal"
                 class="w-full mt-3 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
               >
                 Add to Cart

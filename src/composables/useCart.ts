@@ -68,13 +68,11 @@ export function useCart() {
   const checkPreviewMode = () => {
     const previewing = isPreviewing()
     isPreviewMode.value = previewing
-    console.log('🔍 Preview mode check:', previewing)
     return previewing
   }
 
   // Initialize - llamar inmediatamente al crear el composable
   const initialize = () => {
-    console.log('🚀 Initializing useCart...')
     const previewing = checkPreviewMode()
     
     if (previewing) {
@@ -97,14 +95,14 @@ export function useCart() {
       return
     }
 
-    if (!user.value?.uid) {
+    if (!user.value?.sub) {
       console.log('No user found, skipping cart load')
       return
     }
     
     try {
-      console.log('🛒 Loading real cart for user:', user.value.uid)
-      const rawItems = await getCartItems(user.value.uid)
+      console.log('🛒 Loading real cart for user:', user.value.sub)
+      const rawItems = await getCartItems(user.value.sub)
       cartItems.value = rawItems
       console.log('🛒 Cart loaded:', cartItems.value)
     } catch (error) {

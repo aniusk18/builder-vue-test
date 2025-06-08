@@ -44,13 +44,11 @@ export function useAuth() {
   const checkPreviewMode = () => {
     const previewing = isPreviewing()
     isPreviewMode.value = previewing
-    console.log('🔍 Auth Preview mode check:', previewing)
     return previewing
   }
 
   // Initialize preview mode check
   const initialize = () => {
-    console.log('🚀 Initializing useAuth...')
     checkPreviewMode()
   }
 
@@ -68,9 +66,8 @@ export function useAuth() {
       return null
     }
     
-    console.log('👤 Using real Auth0 user')
     return {
-      uid: auth0User.value.sub,
+      uid: auth0User.value.uid,
       sub: auth0User.value.sub, // Mantener ambos para compatibilidad
       email: auth0User.value.email,
       emailVerified: auth0User.value.email_verified,
@@ -126,7 +123,6 @@ export function useAuth() {
     }
 
     if (newUser && isAuthenticated.value) {
-      console.log('👤 Syncing real user with Supabase')
       await createOrUpdateUser(newUser)
     }
   }, { immediate: true })
